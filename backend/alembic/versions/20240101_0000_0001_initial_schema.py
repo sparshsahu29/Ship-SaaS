@@ -53,7 +53,7 @@ def upgrade() -> None:
     op.create_index(op.f("ix_sessions_token_hash"), "sessions", ["token_hash"], unique=True)
     op.create_index(op.f("ix_sessions_expires_at"), "sessions", ["expires_at"], unique=False)
 
-    token_purpose = sa.Enum("email_verification", "password_reset", name="token_purpose")
+    token_purpose = sa.Enum("password_reset", name="token_purpose")
     op.create_table(
         "one_time_tokens",
         sa.Column("id", sa.Uuid(), nullable=False),

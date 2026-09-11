@@ -20,7 +20,6 @@ class Settings(BaseSettings):
 
     session_cookie_name: str = "session"
     session_ttl_days: int = 14
-    email_verification_ttl_hours: int = 24
     password_reset_ttl_minutes: int = 60
 
     google_client_id: str = ""

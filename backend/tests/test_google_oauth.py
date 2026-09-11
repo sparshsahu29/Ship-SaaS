@@ -10,7 +10,6 @@ from sqlalchemy import select
 from app.auth import google
 from app.core.config import settings
 from app.models import User
-from tests.conftest import USER
 
 COOKIE = settings.session_cookie_name
 
@@ -66,7 +65,7 @@ def test_google_callback_creates_new_verified_user(client, google_enabled, googl
 
 
 def test_google_callback_links_existing_email_account(client, google_enabled, google_profile, signup, db):
-    signup()  # email/password account with the same email, unverified
+    signup()  # existing email/password account with the same email
     client.cookies.clear()
     state = _start(client)
     client.get(f"/api/auth/google/callback?code=abc&state={state}", follow_redirects=False)

@@ -11,12 +11,13 @@ from .user import User
 
 
 class TokenPurpose(str, enum.Enum):
-    EMAIL_VERIFICATION = "email_verification"
     PASSWORD_RESET = "password_reset"
+    # Add further purposes here (e.g. EMAIL_CHANGE = "email_change") together
+    # with an Alembic migration that extends the `token_purpose` enum.
 
 
 class OneTimeToken(UUIDPrimaryKeyMixin, Base):
-    """Single-use, expiring tokens for email verification and password reset."""
+    """Single-use, expiring tokens (currently: password reset)."""
 
     __tablename__ = "one_time_tokens"
 

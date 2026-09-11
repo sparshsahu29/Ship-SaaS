@@ -1,5 +1,5 @@
 Hi $name,
 
-Your email is verified and your $app_name account is ready.
+Welcome to $app_name — your account is ready.
 
 Open $app_name: $link

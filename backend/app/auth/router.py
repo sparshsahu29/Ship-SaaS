@@ -18,7 +18,6 @@ from app.schemas.auth import (
     MessageResponse,
     ResetPasswordRequest,
     SignupRequest,
-    VerifyEmailRequest,
 )
 from app.schemas.user import UserRead
 
@@ -61,17 +60,6 @@ def logout(request: Request, response: Response, db: DB):
 @router.get("/me", response_model=UserRead)
 def me(user: CurrentUser):
     return user
-
-
-@router.post("/verify-email", response_model=UserRead, dependencies=[Depends(auth_rate_limit)])
-def verify_email(payload: VerifyEmailRequest, db: DB, email: Email):
-    return auth_service.verify_email(db, email, payload.token)
-
-
-@router.post("/resend-verification", response_model=MessageResponse, dependencies=[Depends(sensitive_rate_limit)])
-def resend_verification(user: CurrentUser, db: DB, email: Email):
-    auth_service.send_verification_email(db, email, user)
-    return {"message": "If your email is not yet verified, a new link has been sent."}
 
 
 @router.post("/forgot-password", response_model=MessageResponse, dependencies=[Depends(sensitive_rate_limit)])

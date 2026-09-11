@@ -1,6 +1,6 @@
 """Password hashing and opaque token helpers.
 
-Tokens (sessions, email verification, password reset) are random URL-safe
+Tokens (sessions, password reset) are random URL-safe
 strings. Only their SHA-256 hash is persisted; the raw value is shown to the
 user exactly once (cookie or email link).
 """

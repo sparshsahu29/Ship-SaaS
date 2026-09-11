@@ -26,7 +26,7 @@ describe('Signup page', () => {
   it('creates an account and lands on the dashboard', async () => {
     const { calls } = renderApp({
       route: '/signup',
-      routes: { 'POST /api/auth/signup': () => jsonResponse({ ...TEST_USER, is_email_verified: false }, 201) },
+      routes: { 'POST /api/auth/signup': () => jsonResponse(TEST_USER, 201) },
     })
     await screen.findByRole('heading', { name: /create your account/i })
 
@@ -34,7 +34,6 @@ describe('Signup page', () => {
     await userEvent.click(screen.getByRole('button', { name: /create account/i }))
 
     expect(await screen.findByText(/welcome back, ada/i)).toBeInTheDocument()
-    expect(screen.getByText(/please verify your email/i)).toBeInTheDocument()
     const signup = calls.find((c) => c.key === 'POST /api/auth/signup')
     expect(signup.body).toEqual({ name: 'Ada Lovelace', email: 'ada@example.com', password: 'a-strong-password' })
     expect(signup.body.confirmPassword).toBeUndefined()

@@ -39,14 +39,7 @@ export function ProfileSection() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Name" autoComplete="name" {...form.field('name')} />
-            <Input
-              label="Email"
-              type="email"
-              value={user.email}
-              disabled
-              readOnly
-              hint={user.is_email_verified ? 'Verified' : 'Not verified'}
-            />
+            <Input label="Email" type="email" value={user.email} disabled readOnly />
           </div>
           <div className="flex justify-end">
             <Button type="submit" loading={form.submitting} disabled={form.values.name.trim() === user.name}>

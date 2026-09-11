@@ -19,18 +19,26 @@ def test_health(client):
 # -- signup ------------------------------------------------------------------
 
 
-def test_signup_creates_user_sets_cookie_and_sends_verification(client, mailbox):
+def test_signup_creates_user_sets_cookie_and_sends_welcome_email(client, mailbox):
     res = client.post("/api/auth/signup", json=USER)
     assert res.status_code == 201
     body = res.json()
     assert body["email"] == USER["email"]
-    assert body["is_email_verified"] is False
     assert body["has_password"] is True
     assert "password" not in body and "password_hash" not in body
     assert COOKIE in res.cookies
     assert len(mailbox.sent) == 1
     assert mailbox.sent[0]["to"] == USER["email"]
-    assert "/verify-email?token=" in mailbox.sent[0]["text"]
+    assert "Welcome" in mailbox.sent[0]["subject"]
+    assert "token=" not in mailbox.sent[0]["text"]
+
+
+def test_signup_succeeds_even_if_email_fails(client, mailbox, monkeypatch):
+    def boom(**kwargs):
+        raise RuntimeError("smtp down")
+
+    monkeypatch.setattr(mailbox, "send", boom)
+    assert client.post("/api/auth/signup", json=USER).status_code == 201
 
 
 def test_signup_normalizes_email_and_rejects_duplicates(client, user):
@@ -130,47 +138,29 @@ def test_csrf_blocks_missing_origin_with_cookie(client, user):
     assert res.status_code == 403
 
 
-# -- email verification ------------------------------------------------------
+# -- password reset ----------------------------------------------------------
 
 
-def test_verify_email_flow(client, user, mailbox):
-    token = mailbox.last_token("/verify-email")
-    res = client.post("/api/auth/verify-email", json={"token": token})
-    assert res.status_code == 200
-    assert res.json()["is_email_verified"] is True
-    # welcome email sent
-    assert any("Welcome" in m["subject"] for m in mailbox.sent)
-    # token is single-use
-    res = client.post("/api/auth/verify-email", json={"token": token})
+def test_reset_token_invalid(client):
+    res = client.post("/api/auth/reset-password", json={"token": "x" * 40, "password": "new-password-123"})
     assert res.status_code == 400
     assert res.json()["error"]["code"] == "invalid_token"
 
 
-def test_verify_email_invalid_token(client):
-    res = client.post("/api/auth/verify-email", json={"token": "x" * 40})
-    assert res.status_code == 400
-
-
-def test_verify_email_expired_token(client, user, mailbox, db):
-    token = mailbox.last_token("/verify-email")
+def test_reset_token_expired(client, user, mailbox, db):
+    client.post("/api/auth/forgot-password", json={"email": USER["email"]})
+    token = mailbox.last_token("/reset-password")
     record = db.scalar(select(OneTimeToken))
     record.expires_at = utcnow() - timedelta(minutes=1)
     db.commit()
-    assert client.post("/api/auth/verify-email", json={"token": token}).status_code == 400
+    assert client.post("/api/auth/reset-password", json={"token": token, "password": "new-password-123"}).status_code == 400
 
 
-def test_verification_tokens_are_stored_hashed(client, user, mailbox, db):
-    token = mailbox.last_token("/verify-email")
-    assert db.scalar(select(OneTimeToken)).token_hash != token
-
-
-def test_resend_verification(client, user, mailbox):
-    res = client.post("/api/auth/resend-verification")
-    assert res.status_code == 200
-    assert len(mailbox.sent) == 2
-
-
-# -- password reset ----------------------------------------------------------
+def test_reset_tokens_are_stored_hashed(client, user, mailbox, db):
+    client.post("/api/auth/forgot-password", json={"email": USER["email"]})
+    token = mailbox.last_token("/reset-password")
+    stored = db.scalar(select(OneTimeToken)).token_hash
+    assert stored != token and len(stored) == 64
 
 
 def test_forgot_password_does_not_reveal_accounts(client, user, mailbox):

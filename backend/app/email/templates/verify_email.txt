@@ -1,7 +1,0 @@
-Hi $name,
-
-Thanks for signing up for $app_name. Please confirm your email address by opening this link:
-
-$link
-
-This link expires in $hours hours. If you didn't create an account, you can safely ignore this email.

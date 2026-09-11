@@ -11,7 +11,6 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { SignupPage } from './pages/SignupPage'
-import { VerifyEmailPage } from './pages/VerifyEmailPage'
 
 export function AppRoutes() {
   return (
@@ -26,11 +25,6 @@ export function AppRoutes() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
-      </Route>
-
-      {/* Public regardless of auth state */}
-      <Route element={<AuthLayout />}>
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Route>
 
       {/* Authenticated app */}

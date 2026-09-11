@@ -48,9 +48,5 @@ class ChangePasswordRequest(BaseModel):
     new_password: Password
 
 
-class VerifyEmailRequest(BaseModel):
-    token: str = Field(min_length=16, max_length=256)
-
-
 class MessageResponse(BaseModel):
     message: str

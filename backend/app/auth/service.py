@@ -65,7 +65,10 @@ def signup(db: DBSession, email_service: EmailService, *, email: str, name: str,
     if get_user_by_email(db, email):
         raise ConflictError("An account with this email already exists.", code="email_taken")
     user = create_user(db, email=email, name=name, password=password)
-    send_verification_email(db, email_service, user)
+    try:
+        email_service.send_welcome_email(to=user.email, name=user.name)
+    except Exception:
+        pass  # Already logged by EmailService; signup must still succeed.
     logger.info("User signed up", extra={"user_id": str(user.id)})
     return user
 
@@ -151,28 +154,6 @@ def _consume_token(db: DBSession, raw: str, purpose: TokenPurpose) -> User:
         raise InvalidTokenError("This link is invalid or has expired.")
     record.used_at = utcnow()
     return record.user
-
-
-def send_verification_email(db: DBSession, email_service: EmailService, user: User) -> None:
-    if user.is_email_verified:
-        return
-    token = _issue_token(db, user, TokenPurpose.EMAIL_VERIFICATION, timedelta(hours=settings.email_verification_ttl_hours))
-    try:
-        email_service.send_verification_email(to=user.email, name=user.name, token=token)
-    except Exception:
-        # Signup should still succeed; the user can request a new link from the app.
-        pass
-
-
-def verify_email(db: DBSession, email_service: EmailService, token: str) -> User:
-    user = _consume_token(db, token, TokenPurpose.EMAIL_VERIFICATION)
-    if not user.is_email_verified:
-        user.is_email_verified = True
-        try:
-            email_service.send_welcome_email(to=user.email, name=user.name)
-        except Exception:
-            pass
-    return user
 
 
 def request_password_reset(db: DBSession, email_service: EmailService, email: str) -> None:

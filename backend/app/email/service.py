@@ -28,15 +28,6 @@ class EmailService:
 
     # -- public API -----------------------------------------------------------
 
-    def send_verification_email(self, *, to: str, name: str, token: str) -> None:
-        link = f"{self.settings.frontend_url}/verify-email?token={token}"
-        self._send(
-            to=to,
-            subject=f"Verify your email for {self.settings.app_name}",
-            template="verify_email",
-            context={"name": name, "link": link, "hours": self.settings.email_verification_ttl_hours},
-        )
-
     def send_password_reset_email(self, *, to: str, name: str, token: str) -> None:
         link = f"{self.settings.frontend_url}/reset-password?token={token}"
         self._send(

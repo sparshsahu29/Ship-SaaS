@@ -6,10 +6,12 @@ sessions, email and the app shell are already done.
 
 **Stack:** React 19 + Vite + Tailwind CSS v4 (JavaScript) · FastAPI + SQLAlchemy 2 + Alembic · PostgreSQL
 
+See [FEATURES.md](FEATURES.md) for a detailed feature inventory.
+
 **Included**
 
 - Email/password signup & login, Google OAuth, logout
-- Email verification, forgot/reset password, change password
+- Forgot/reset password, change password, welcome email on signup
 - Server-side sessions in httpOnly cookies, CSRF protection, rate limiting
 - Profile update, account deletion
 - Responsive dashboard shell (sidebar, top bar, user menu) with placeholder dashboard and settings page
@@ -205,7 +207,7 @@ npm test
 ```
 
 Backend tests cover signup, login, logout, `/me`, invalid credentials,
-duplicate emails, session expiry, CSRF, email verification, password reset,
+duplicate emails, session expiry, CSRF, password reset (invalid/expired/single-use tokens),
 password change with session revocation, Google OAuth (state validation,
 account creation and linking), profile update, cascading account deletion and
 rate limiting. Frontend tests cover the login/signup forms, protected and guest
@@ -300,7 +302,7 @@ saas-starter/
       components/              Button, Input, PasswordInput, Card, Modal, Toast, Avatar, Dropdown,
                                Navbar, Sidebar, UserMenu, EmptyState, FormError, LoadingSpinner…
       layouts/                 AuthLayout (public), AppLayout (sidebar + navbar)
-      pages/                   Login, Signup, ForgotPassword, ResetPassword, VerifyEmail, Dashboard, settings/
+      pages/                   Login, Signup, ForgotPassword, ResetPassword, Dashboard, settings/
       hooks/useForm.js         small form state/validation helper
       features/                <- your product code goes here
     tests/                     Vitest + Testing Library
@@ -329,10 +331,10 @@ touching auth. None are implemented — nothing fake is shipped.
 | **Passwords** | Argon2id via `argon2-cffi` with library defaults; hashes are transparently upgraded on login if parameters change. Minimum 8 chars, max 128. Users created via Google have no password until they set one. |
 | **CSRF** | `SameSite=Lax` cookie + Origin/Referer check on every `POST/PUT/PATCH/DELETE` (must match `FRONTEND_URL`/`CORS_ORIGINS`). Browsers always send `Origin` on cross-origin fetches and it cannot be spoofed by a page, so no CSRF token is needed for a JSON API. |
 | **CORS** | Only `FRONTEND_URL` + `CORS_ORIGINS`, `allow_credentials=True`, explicit methods/headers. Never `*`. |
-| **One-time tokens** | Email verification (24h) and password reset (60min) tokens are random, stored hashed, single-use, and superseded when a new one is issued. Successful reset revokes all sessions and marks the email verified. |
+| **One-time tokens** | Password reset tokens (60 min) are random, stored hashed, single-use, and superseded when a new one is issued. Successful reset revokes all sessions. The `one_time_tokens` table is generic (`purpose` enum) so further flows can reuse it. |
 | **Enumeration** | `forgot-password` always returns the same message; login returns the same error for unknown email and wrong password; failed logins are logged with only the email domain. |
 | **Google OAuth** | Authorization-code flow entirely server-side. `state` is HMAC-signed with `SECRET_KEY`, time-limited (10 min) and mirrored in a cookie scoped to `/api/auth/google`. Profile is fetched from Google's userinfo endpoint over the back channel; `email_verified` is required before linking. |
-| **Rate limiting** | Auth endpoints: 10 req/min per IP; forgot-password/resend-verification: 5 per 15 min. `X-Forwarded-For` is only trusted in production (behind your proxy). |
+| **Rate limiting** | Auth endpoints: 10 req/min per IP; forgot-password: 5 per 15 min. `X-Forwarded-For` is only trusted in production (behind your proxy). |
 | **Errors** | One shape: `{"error": {"code", "message", "details?"}}`. Unhandled exceptions are logged with stack trace and returned as a generic 500. OpenAPI docs disabled in production. |
 | **Headers** | `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Cache-Control: no-store`, HSTS in production. |
 | **Logging** | Structured JSON in production. Passwords, session tokens, one-time tokens and OAuth secrets are never logged; email bodies are never logged on failure. |
@@ -345,12 +347,10 @@ All endpoints are under `/api`. Interactive docs at `/docs` in development.
 | Method | Path | Auth | Description |
 | --- | --- | --- | --- |
 | GET | `/health` | – | Liveness + DB check |
-| POST | `/auth/signup` | – | Create account, sets session cookie, sends verification email |
+| POST | `/auth/signup` | – | Create account, sets session cookie, sends welcome email |
 | POST | `/auth/login` | – | Sets session cookie |
 | POST | `/auth/logout` | cookie | Revokes session, clears cookie |
 | GET | `/auth/me` | cookie | Current user |
-| POST | `/auth/verify-email` | – | `{token}` |
-| POST | `/auth/resend-verification` | cookie | Sends a new verification link |
 | POST | `/auth/forgot-password` | – | `{email}` — always 200 |
 | POST | `/auth/reset-password` | – | `{token, password}` — revokes all sessions |
 | POST | `/auth/change-password` | cookie | `{current_password?, new_password}` — keeps current session, revokes others |

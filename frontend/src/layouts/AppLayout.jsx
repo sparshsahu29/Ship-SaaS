@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Navbar } from '../components/Navbar'
 import { Sidebar, navigation } from '../components/Sidebar'
-import { EmailVerificationBanner } from '../components/EmailVerificationBanner'
 
 /** Authenticated shell: sidebar + top bar + content area for /app/*. */
 export function AppLayout() {
@@ -15,7 +14,6 @@ export function AppLayout() {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} title={title} />
-        <EmailVerificationBanner />
         <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
           <div className="mx-auto w-full max-w-5xl">
             <Outlet />

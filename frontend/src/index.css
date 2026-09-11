@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Edit the values in :root to re-theme the whole app; the
+ * @theme block maps them to Tailwind utilities (bg-primary, text-muted, ...).
+ */
+:root {
+  --color-primary: #18181b;
+  --color-primary-foreground: #ffffff;
+  --color-background: #fafafa;
+  --color-foreground: #18181b;
+  --color-muted: #71717a;
+  --color-muted-background: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-card: #ffffff;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #16a34a;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-background: var(--color-muted-background);
+  --color-border: var(--color-border);
+  --color-card: var(--color-card);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-success: var(--color-success);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.25rem);
+}
+
+@layer base {
+  html {
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+}

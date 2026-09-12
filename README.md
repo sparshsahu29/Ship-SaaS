@@ -14,7 +14,7 @@ See [FEATURES.md](FEATURES.md) for a detailed feature inventory.
 - Forgot/reset password, change password, welcome email on signup
 - Server-side sessions in httpOnly cookies, CSRF protection, rate limiting
 - Profile update, account deletion
-- Responsive dashboard shell (sidebar, top bar, user menu) with placeholder dashboard and settings page
+- Blank public landing page, responsive dashboard shell (top bar + user menu) with placeholder dashboard and settings page
 - Transactional email abstraction (console / SMTP / Resend)
 - Alembic migrations, Docker Compose for local dev, backend + frontend tests
 
@@ -254,7 +254,8 @@ Configure SPA fallback so every path serves `index.html`.
 6. **Configure Google OAuth** (§8) — optional.
 7. **Configure the email provider** (§9).
 8. **Run migrations:** `alembic upgrade head`.
-9. **Replace the dashboard placeholder** in `frontend/src/pages/DashboardPage.jsx`.
+9. **Replace the placeholders**: the dashboard in `frontend/src/pages/DashboardPage.jsx`
+    and the landing hero in `frontend/src/pages/LandingPage.jsx`.
 10. **Add product models** under `backend/app/features/<feature>/models.py`,
     import them in `backend/app/models/__init__.py`, and
     `alembic revision --autogenerate`.
@@ -262,8 +263,8 @@ Configure SPA fallback so every path serves `index.html`.
     and include the router in `backend/app/main.py`. Use `CurrentUser` and `DB`
     from `app.core.dependencies`.
 12. **Add product pages** under `frontend/src/features/<feature>/`, register
-    routes in `frontend/src/App.jsx` and sidebar links in
-    `frontend/src/components/Sidebar.jsx`.
+    routes in `frontend/src/App.jsx` and top-bar links in the `navigation`
+    array in `frontend/src/components/Navbar.jsx`.
 13. **Deploy** (§11).
 
 Nothing in `backend/app/auth`, `backend/app/users`, `backend/app/core` or
@@ -300,9 +301,9 @@ saas-starter/
       services/                api.js (fetch wrapper, error normalisation), auth.js, users.js
       auth/                    AuthContext (user, loading, login, signup, logout, refreshUser), ProtectedRoute
       components/              Button, Input, PasswordInput, Card, Modal, Toast, Avatar, Dropdown,
-                               Navbar, Sidebar, UserMenu, EmptyState, FormError, LoadingSpinner…
-      layouts/                 AuthLayout (public), AppLayout (sidebar + navbar)
-      pages/                   Login, Signup, ForgotPassword, ResetPassword, Dashboard, settings/
+                               Navbar, UserMenu, EmptyState, FormError, LoadingSpinner…
+      layouts/                 AuthLayout (public), AppLayout (top bar + content)
+      pages/                   Landing, Login, Signup, ForgotPassword, ResetPassword, Dashboard, settings/
       hooks/useForm.js         small form state/validation helper
       features/                <- your product code goes here
     tests/                     Vitest + Testing Library

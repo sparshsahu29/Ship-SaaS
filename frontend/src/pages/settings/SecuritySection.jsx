@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
+import { useLogout } from '../../auth/useLogout'
 import { Button } from '../../components/Button'
 import { Card, CardBody, CardHeader } from '../../components/Card'
 import { FormErrorBanner } from '../../components/FormError'
@@ -9,9 +9,9 @@ import { useForm, validators } from '../../hooks/useForm'
 import { authService } from '../../services/auth'
 
 export function SecuritySection() {
-  const { user, logout, refreshUser } = useAuth()
+  const { user, refreshUser } = useAuth()
   const toast = useToast()
-  const navigate = useNavigate()
+  const logout = useLogout()
 
   const form = useForm({
     initialValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
@@ -39,7 +39,7 @@ export function SecuritySection() {
         title="Security"
         description={user.has_password ? 'Change your password.' : 'Set a password to sign in without Google.'}
         action={
-          <Button variant="secondary" size="sm" onClick={() => logout().then(() => navigate('/login'))}>
+          <Button variant="secondary" size="sm" onClick={logout}>
             Log out
           </Button>
         }

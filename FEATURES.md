@@ -181,7 +181,7 @@ Adding a provider = one class with `send(to, subject, html, text)` registered in
 ### 7.1 Pages
 | Route | Page | Notes |
 | --- | --- | --- |
-| `/` | redirect → `/app/dashboard` | |
+| `/` | LandingPage | Public, blank hero with app name/description. Guests see **Log in** / **Sign up** in the header and **Create account** / **Log in** CTAs; signed-in users see **Go to dashboard**. Intended to be replaced with marketing content. |
 | `/login` | LoginPage | Google button, divider, email/password, forgot-password link, signup link, inline + API errors, Google failure banner via `?error=google` |
 | `/signup` | SignupPage | Name, email, password, confirm, Google button, client-side validation |
 | `/forgot-password` | ForgotPasswordPage | Success state with the server's neutral message |
@@ -192,13 +192,14 @@ Adding a provider = one class with `send(to, subject, html, text)` registered in
 | `*` | NotFoundPage | Links to dashboard or login depending on auth state |
 
 ### 7.2 App shell
-- **Sidebar**: Dashboard + Settings links driven by a single `navigation` array; slides in as a drawer on mobile with backdrop; active-link styling.
-- **Navbar**: hamburger (mobile), current section title, user menu.
-- **UserMenu**: avatar trigger, name/email, Settings, Log out — accessible dropdown (roles `menu`/`menuitem`, arrow-key navigation, Escape/outside-click to close).
-- Files: `F:layouts/AppLayout.jsx`, `F:components/Sidebar.jsx`, `F:components/Navbar.jsx`, `F:components/UserMenu.jsx`.
+- **No sidebar** — a single top bar keeps the shell minimal and leaves the full width for product UI.
+- **Navbar**: logo (links to dashboard), horizontal links driven by a single `navigation` array (Dashboard by default; add product pages here), user menu on the right. Sticky, translucent.
+- **UserMenu**: avatar trigger opens an accessible dropdown (roles `menu`/`menuitem`, arrow-key navigation, Escape/outside-click to close) showing name/email, **Settings** (gear icon) and **Log out**. Settings is reached only from here, keeping the nav bar uncluttered.
+- **Logout** (`useLogout`) navigates to the landing page first, then clears the session, so users never flash through `/login`.
+- Files: `F:layouts/AppLayout.jsx`, `F:components/Navbar.jsx`, `F:components/UserMenu.jsx`, `F:auth/useLogout.js`.
 
 ### 7.3 Reusable components (`F:components/`)
-`Button` (variants primary/secondary/ghost/destructive, sizes, loading, fullWidth) · `Input` (label, error, hint, trailing slot, aria wiring) · `PasswordInput` (show/hide toggle) · `FormError` / `FormErrorBanner` · `Card` / `CardHeader` / `CardBody` · `Modal` (native `<dialog>`, focus trap, Escape/backdrop close) · `Toast` / `ToastProvider` / `useToast` (success/error/info, auto-dismiss, `aria-live`) · `LoadingSpinner` / `FullPageSpinner` · `Avatar` (image with fallback to initials) · `Dropdown` / `DropdownItem` / `DropdownSeparator` · `EmptyState` · `Logo` · `GoogleButton`.
+`Button` (variants primary/secondary/ghost/destructive, sizes, loading, fullWidth, renders a router `<Link>` when given `to`) · `Input` (label, error, hint, trailing slot, aria wiring) · `PasswordInput` (show/hide toggle) · `FormError` / `FormErrorBanner` · `Card` / `CardHeader` / `CardBody` · `Modal` (native `<dialog>`, focus trap, Escape/backdrop close) · `Toast` / `ToastProvider` / `useToast` (success/error/info, auto-dismiss, `aria-live`) · `LoadingSpinner` / `FullPageSpinner` · `Avatar` (image with fallback to initials) · `Dropdown` / `DropdownItem` / `DropdownSeparator` · `EmptyState` · `Logo` · `GoogleButton`.
 
 ### 7.4 Data layer
 - `services/api.js`: single `fetch` wrapper — base URL from `VITE_API_URL`, `credentials: 'include'`, JSON encode/decode, `204` handling, network-error normalisation, `ApiError` with `status/code/message/details/fieldErrors`, 401 subscription hook.
@@ -239,10 +240,11 @@ Labelled inputs with `aria-invalid`/`aria-describedby`, `role="alert"` errors, k
 - **Users**: name update (trimmed); empty name rejected, unknown fields ignored; auth required; deletion cascades to sessions/tokens and invalidates login.
 - **Infrastructure**: rate limit returns 429; 404 error format; security headers; production config fail-fast (5 cases); CORS origin merging.
 
-### Frontend — `frontend/tests/` (Vitest + Testing Library + jsdom, mocked fetch, 18 tests)
+### Frontend — `frontend/tests/` (Vitest + Testing Library + jsdom, mocked fetch, 22 tests)
 - **Login**: validation before API call; successful login → dashboard with cookie credentials; API error display; Google failure banner; Google button present.
 - **Signup**: password length/match validation; account creation → dashboard with correct payload; duplicate email error.
-- **Auth routing**: loading state hides protected UI; `/app/*` → `/login` when logged out; `/login` → dashboard when logged in; session restored via `/me`; logout from user menu; user dropped on `401 not_authenticated`.
+- **Auth routing**: loading state hides protected UI; `/app/*` → `/login` when logged out; `/login` → dashboard when logged in; session restored via `/me`; logout from user menu lands on `/`; Settings reachable from user menu; user dropped on `401 not_authenticated`.
+- **Landing**: guest CTAs link to `/signup` and `/login`; signed-in users get a dashboard link; Create account navigates to the signup page.
 - **Settings**: profile details shown; name update; password change incl. wrong-current-password error; account deletion gated by typed confirmation.
 
 ---

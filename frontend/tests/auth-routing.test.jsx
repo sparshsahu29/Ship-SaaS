@@ -36,7 +36,7 @@ describe('Auth state and protected routes', () => {
     expect(me.init.credentials).toBe('include')
   })
 
-  it('logs out from the user menu and returns to /login', async () => {
+  it('logs out from the user menu and returns to the landing page', async () => {
     const { calls } = renderApp({
       route: '/app/dashboard',
       routes: { ...authenticatedRoutes, 'POST /api/auth/logout': () => jsonResponse({ message: 'Logged out.' }) },
@@ -46,8 +46,18 @@ describe('Auth state and protected routes', () => {
     await userEvent.click(screen.getByRole('button', { name: /open user menu/i }))
     await userEvent.click(await screen.findByRole('menuitem', { name: /log out/i }))
 
-    expect(await screen.findByRole('heading', { name: /welcome back/i })).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: /create account/i })).toBeInTheDocument()
     expect(calls.some((c) => c.key === 'POST /api/auth/logout')).toBe(true)
+  })
+
+  it('navigates to settings from the user menu', async () => {
+    renderApp({ route: '/app/dashboard', routes: authenticatedRoutes })
+    await screen.findByText(/welcome back, ada/i)
+
+    await userEvent.click(screen.getByRole('button', { name: /open user menu/i }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: /settings/i }))
+
+    expect(await screen.findByRole('heading', { name: /^settings$/i })).toBeInTheDocument()
   })
 
   it('drops the user when an API call returns 401', async () => {

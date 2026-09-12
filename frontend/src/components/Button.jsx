@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { cn } from '../lib/cn'
 import { LoadingSpinner } from './LoadingSpinner'
 
@@ -14,6 +15,7 @@ const sizes = {
   lg: 'h-11 px-5 text-base',
 }
 
+/** Renders a <button>, or a router <Link> when `to` is given. */
 export function Button({
   variant = 'primary',
   size = 'md',
@@ -23,22 +25,27 @@ export function Button({
   children,
   disabled,
   type = 'button',
+  to,
   ...props
 }) {
+  const classes = cn(
+    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
+    variants[variant],
+    sizes[size],
+    fullWidth && 'w-full',
+    className,
+  )
+
+  if (to) {
+    return (
+      <Link to={to} className={classes} {...props}>
+        {children}
+      </Link>
+    )
+  }
+
   return (
-    <button
-      type={type}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
-        variants[variant],
-        sizes[size],
-        fullWidth && 'w-full',
-        className,
-      )}
-      {...props}
-    >
+    <button type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={classes} {...props}>
       {loading && <LoadingSpinner size="sm" />}
       {children}
     </button>

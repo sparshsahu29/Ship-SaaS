@@ -12,5 +12,7 @@ export default defineConfig({
     setupFiles: './tests/setup.js',
     include: ['tests/**/*.test.{js,jsx}'],
     css: false,
+    // jsdom workers are memory-hungry; one worker keeps the suite stable on small machines.
+    maxWorkers: 1,
   },
 })

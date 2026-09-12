@@ -6,6 +6,7 @@ import { AppLayout } from './layouts/AppLayout'
 import { AuthLayout } from './layouts/AuthLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
@@ -15,7 +16,8 @@ import { SignupPage } from './pages/SignupPage'
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
+      {/* Public landing page (works for guests and signed-in users) */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* Public: redirect to the app if already signed in */}
       <Route element={<GuestRoute />}>

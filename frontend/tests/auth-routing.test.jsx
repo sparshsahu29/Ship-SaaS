@@ -46,7 +46,7 @@ describe('Auth state and protected routes', () => {
     await userEvent.click(screen.getByRole('button', { name: /open user menu/i }))
     await userEvent.click(await screen.findByRole('menuitem', { name: /log out/i }))
 
-    expect(await screen.findByRole('link', { name: /create account/i })).toBeInTheDocument()
+    expect(await screen.findByRole("heading", { name: /landing page/i })).toBeInTheDocument()
     expect(calls.some((c) => c.key === 'POST /api/auth/logout')).toBe(true)
   })
 

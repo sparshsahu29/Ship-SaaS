@@ -181,7 +181,7 @@ Adding a provider = one class with `send(to, subject, html, text)` registered in
 ### 7.1 Pages
 | Route | Page | Notes |
 | --- | --- | --- |
-| `/` | LandingPage | Public. Header with logo and **Log in** / **Sign up** (or **Go to dashboard** when signed in); the body is a "Landing page" placeholder to replace with your marketing content. |
+| `/` | LandingPage | Public. Header with logo and **Log in** / **Sign up** (or **Go to dashboard** when signed in). Hero: "Landing page" label, app name, description, and **Create account** / **Log in** CTAs for guests — replace with your marketing content. |
 | `/login` | LoginPage | Google button, divider, email/password, forgot-password link, signup link, inline + API errors, Google failure banner via `?error=google` |
 | `/signup` | SignupPage | Name, email, password, confirm, Google button, client-side validation |
 | `/forgot-password` | ForgotPasswordPage | Success state with the server's neutral message |
@@ -244,7 +244,7 @@ Labelled inputs with `aria-invalid`/`aria-describedby`, `role="alert"` errors, k
 - **Login**: validation before API call; successful login → dashboard with cookie credentials; API error display; Google failure banner; Google button present.
 - **Signup**: password length/match validation; account creation → dashboard with correct payload; duplicate email error.
 - **Auth routing**: loading state hides protected UI; `/app/*` → `/login` when logged out; `/login` → dashboard when logged in; session restored via `/me`; logout from user menu lands on `/`; Settings reachable from user menu; user dropped on `401 not_authenticated`.
-- **Landing**: header links go to `/signup` and `/login`; signed-in users get a dashboard link; Sign up navigates to the signup page.
+- **Landing**: placeholder label, app name and CTAs shown to guests (links to `/signup` and `/login`); signed-in users get a dashboard link; Create account navigates to the signup page.
 - **Settings**: profile details shown; name update; password change incl. wrong-current-password error; account deletion gated by typed confirmation.
 
 ---

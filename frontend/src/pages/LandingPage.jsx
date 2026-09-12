@@ -10,6 +10,7 @@ import { appConfig } from '../config/appConfig'
  */
 export function LandingPage() {
   const { isAuthenticated, loading } = useAuth()
+  const guest = !loading && !isAuthenticated
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -30,7 +31,17 @@ export function LandingPage() {
       </header>
 
       <main className="flex flex-1 items-center justify-center px-4 py-16">
-        <h1 className="text-3xl font-semibold tracking-tight text-muted sm:text-4xl">Landing page</h1>
+        <div className="max-w-xl text-center">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted">Landing page</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{appConfig.appName}</h1>
+          <p className="mt-3 text-base text-muted">{appConfig.description}</p>
+          {guest && (
+            <div className="mt-8 flex justify-center gap-3">
+              <Button to="/signup" size="lg">Create account</Button>
+              <Button to="/login" size="lg" variant="secondary">Log in</Button>
+            </div>
+          )}
+        </div>
       </main>
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted">

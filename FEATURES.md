@@ -193,7 +193,7 @@ Adding a provider = one class with `send(to, subject, html, text)` registered in
 
 ### 7.2 App shell
 - **No sidebar** — a single top bar keeps the shell minimal and leaves the full width for product UI.
-- **Navbar**: logo (links to dashboard), horizontal links driven by a single `navigation` array (Dashboard by default; add product pages here), user menu on the right. Sticky, translucent.
+- **Navbar**: logo (links to dashboard), horizontal links driven by a single `navigation` array (empty by default — add product pages here), user menu on the right. Sticky, translucent.
 - **UserMenu**: avatar trigger opens an accessible dropdown (roles `menu`/`menuitem`, arrow-key navigation, Escape/outside-click to close) showing name/email, **Settings** (gear icon) and **Log out**. Settings is reached only from here, keeping the nav bar uncluttered.
 - **Logout** (`useLogout`) navigates to the landing page first, then clears the session, so users never flash through `/login`.
 - Files: `F:layouts/AppLayout.jsx`, `F:components/Navbar.jsx`, `F:components/UserMenu.jsx`, `F:auth/useLogout.js`.
